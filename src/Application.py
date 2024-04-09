@@ -1,6 +1,5 @@
 from src.CommandCollection import *
-
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder
 
 class Application:
     def __init__(self,telegram_token):

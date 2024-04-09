@@ -1,10 +1,8 @@
 from telegram.ext import CommandHandler, ContextTypes
-from telegram import Update
+from telegram import Update,User
 
 
-help_content_for_regular_user = dict(
-    [
-        {"help","""
+help_content_for_regular_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
                 /help - 명령어 도움말을 실행합니다.
                 /myid - 유저의 텔레그램 아이디를 제공 받을 수 있습니다.
@@ -13,14 +11,8 @@ help_content_for_regular_user = dict(
                 /inventory - 유저의 인벤토리 현황을 볼 수 있습니다.
                 /openbox - 랜덤상자를 열 수 있습니다.
                 """
-         },
-        
-    ]
-)
 
-help_content_for_admin_user = dict(
-    [
-        {"help","""
+help_content_for_admin_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
                 /help - 명령어 도움말을 실행합니다.
                 /myid - 유저의 텔레그램 아이디를 제공 받을 수 있습니다.
@@ -41,10 +33,7 @@ help_content_for_admin_user = dict(
                 /editbox - Edit a box
                 /deletebox <box_id> - Delete a box
                 """
-         },
-        
-    ]
-)
+
 
 '''
 <h1>CommandHandler</h1>
@@ -61,8 +50,10 @@ class CommandCollection:
         await update.message.reply_text(help_content_for_regular_user)
 
     @staticmethod
-    async def myid(self):
-        pass
+    async def myid(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.message.from_user["id"]
+        await update.message.reply_text(f"회원님의 텔레그램 아이디는 {user_id} 입니다.")
+
 
     @staticmethod
     async def balance(self):
