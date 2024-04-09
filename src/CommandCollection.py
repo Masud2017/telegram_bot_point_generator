@@ -1,7 +1,6 @@
 from telegram.ext import CommandHandler, ContextTypes
 from telegram import Update,User
 
-
 help_content_for_regular_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
                 /help - 명령어 도움말을 실행합니다.
@@ -47,11 +46,28 @@ class CommandCollection:
 
     @staticmethod
     async def help(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-        await update.message.reply_text(help_content_for_regular_user)
+        # getting the admin user id
+        data = await context.bot.getChatAdministrators(update.message.chat.id)
+        admin_user_id = 0
+        for x in data:
+            if x.status == "creator":
+                admin_user_id = x.user.id
+                break
+        # print(data[1].status)
+        # print(data[1].user.id)
+
+
+        current_user_id = update.message.from_user["id"]
+        if (current_user_id == admin_user_id):
+            await update.message.reply_text(help_content_for_admin_user)
+        else:
+            await update.message.reply_text(help_content_for_regular_user)
 
     @staticmethod
     async def myid(update:Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user["id"]
+        
+        print(update.message)
         await update.message.reply_text(f"회원님의 텔레그램 아이디는 {user_id} 입니다.")
 
 
