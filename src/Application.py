@@ -1,19 +1,28 @@
-from telegram import Update
+from src.CommandCollection import *
+
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Hello {update.effective_user.first_name}')
-
-
-app = ApplicationBuilder().token("").build()
-
-app.add_handler(CommandHandler("hello", hello))
-
-app.run_polling()
 
 class Application:
     def __init__(self,telegram_token):
-        self.telegram_token = telegram_token
+        self.app = ApplicationBuilder().token(telegram_token).build()
+
 
     def start_application(self):
-        pass
+        self.app.add_handler(help_command)
+        self.app.add_handler(myid_command)
+        self.app.add_handler(balance_command)
+        self.app.add_handler(transfer_command)
+        self.app.add_handler(inventory_command)
+        self.app.add_handler(openbox_command)
+        self.app.add_handler(addbalance_command)
+        self.app.add_handler(addbox_command)
+        self.app.add_handler(showboxes_command)
+        self.app.add_handler(additem_command)
+        self.app.add_handler(showitems_command)
+        self.app.add_handler(unlistitem_command)
+        self.app.add_handler(withdrawitem_command)
+        self.app.add_handler(editprobability_command)
+        self.app.add_handler(editbox_command)
+        self.app.add_handler(deletebox_command)
+
+        self.app.run_polling()

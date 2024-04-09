@@ -1,4 +1,6 @@
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import CommandHandler, ContextTypes
+from telegram import Update
+
 
 help_content_for_regular_user = dict(
     [
@@ -55,93 +57,93 @@ class CommandCollection:
         pass
 
     @staticmethod
-    def help(self):
+    async def help(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
+        await update.message.reply_text(help_content_for_regular_user)
+
+    @staticmethod
+    async def myid(self):
         pass
 
     @staticmethod
-    def myid(self):
+    async def balance(self):
         pass
 
     @staticmethod
-    def balance(self):
+    async def transfer(self, telegram_id, amount):
         pass
 
     @staticmethod
-    def transfer(self, telegram_id, amount):
-        pass
-
-    @staticmethod
-    def inventory(self):
+    async def inventory(self):
         pass
     
     @staticmethod
-    def openbox(self):
+    async def openbox(self):
         pass
 
     # Admin specific command section started
     @staticmethod
-    def addbalance(user_id, amount):
+    async def addbalance(user_id, amount):
         # Logic for the /addbalance command
         pass
 
     @staticmethod
-    def addbox():
+    async def addbox():
         # Logic for the /addbox command
         pass
 
     @staticmethod
-    def showboxes():
+    async def showboxes():
         # Logic for the /showboxes command
         pass
 
     @staticmethod
-    def additem():
+    async def additem():
         # Logic for the /additem command
         pass
 
     @staticmethod
-    def showitems(box_id):
+    async def showitems(box_id):
         # Logic for the /showitems command
         pass
 
     @staticmethod
-    def unlistitem(box_id, item_name):
+    async def unlistitem(box_id, item_name):
         # Logic for the /unlistitem command
         pass
 
     @staticmethod
-    def withdrawitem(user_id, item_name, quantity):
+    async def withdrawitem(user_id, item_name, quantity):
         # Logic for the /withdrawitem command
         pass
 
     @staticmethod
-    def editprobability(box_id, item_name, probability):
+    async def editprobability(box_id, item_name, probability):
         # Logic for the /editprobability command
         pass
 
     @staticmethod
-    def editbox():
+    async def editbox():
         # Logic for the /editbox command
         pass
 
     @staticmethod
-    def deletebox(box_id):
+    async def deletebox(box_id):
         # Logic for the /deletebox command
         pass
 
-help_command = CommandHandler("/help", CommandHandler.help)
-myid_command = CommandHandler("/myid", CommandHandler.myid)
-balance_command = CommandHandler("/balance", CommandHandler.balance)
-transfer_command = CommandHandler("/transfer", CommandHandler.transfer)
-inventory_command = CommandHandler("/inventory", CommandHandler.inventory)
-openbox_command = CommandHandler("/openbox", CommandHandler.openbox)
-addbalance_command = CommandHandler("/addbalance", CommandHandler.addbalance)
-addbox_command = CommandHandler("/addbox", CommandHandler.addbox)
-showboxes_command = CommandHandler("/showboxes", CommandHandler.showboxes)
-additem_command = CommandHandler("/additem", CommandHandler.additem)
-showitems_command = CommandHandler("/showitems", CommandHandler.showitems)
-unlistitem_command = CommandHandler("/unlistitem", CommandHandler.unlistitem)
-withdrawitem_command = CommandHandler("/withdrawitem", CommandHandler.withdrawitem)
-editprobability_command = CommandHandler("/editprobability", CommandHandler.editprobability)
-editbox_command = CommandHandler("/editbox", CommandHandler.editbox)
-deletebox_command = CommandHandler("/deletebox", CommandHandler.deletebox)
+help_command = CommandHandler("help", CommandCollection.help)
+myid_command = CommandHandler("myid", CommandCollection.myid)
+balance_command = CommandHandler("balance", CommandCollection.balance)
+transfer_command = CommandHandler("transfer", CommandCollection.transfer)
+inventory_command = CommandHandler("inventory", CommandCollection.inventory)
+openbox_command = CommandHandler("openbox", CommandCollection.openbox)
+addbalance_command = CommandHandler("addbalance", CommandCollection.addbalance)
+addbox_command = CommandHandler("addbox", CommandCollection.addbox)
+showboxes_command = CommandHandler("showboxes", CommandCollection.showboxes)
+additem_command = CommandHandler("additem", CommandCollection.additem)
+showitems_command = CommandHandler("showitems", CommandCollection.showitems)
+unlistitem_command = CommandHandler("unlistitem", CommandCollection.unlistitem)
+withdrawitem_command = CommandHandler("withdrawitem", CommandCollection.withdrawitem)
+editprobability_command = CommandHandler("editprobability", CommandCollection.editprobability)
+editbox_command = CommandHandler("editbox", CommandCollection.editbox)
+deletebox_command = CommandHandler("deletebox", CommandCollection.deletebox)
