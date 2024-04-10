@@ -92,3 +92,16 @@ class DataBase:
             return True
         else:
             False
+
+
+    def get_inventory(self,user_id:str):
+        users = json.loads(self.db.get("users"))
+        inventory = {}
+        for item in users[user_id]["inventory"]:
+            name = item["name"]
+            if name in inventory:
+                inventory[name] += 1
+            else:
+                inventory[name] = 1
+
+        return inventory

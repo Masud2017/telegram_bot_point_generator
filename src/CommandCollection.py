@@ -80,19 +80,33 @@ class CommandCollection:
         recipient_user_id = splitted_message[1]
         amount = int(splitted_message[2])
         current_user_id = str(update.message.from_user["id"])
+        
 
         if (db.is_user_exist(recipient_user_id)):
             if await db.transfer_currency(current_user_id,recipient_user_id,amount):
-                await update.message_reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+                await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
             else:
-                await update.message_update_text("잔액이 부족합니다.")
+                await update.message.update_text("잔액이 부족합니다.")
         else:
-            await update.message_update_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
+            await update.message.update_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
 
 
     @staticmethod
-    async def inventory(self):
-        pass
+    async def inventory(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        admin_user_id = await get_admin_user_id()
+        current_user_id = current_user_id = update.message.from_user["id"]
+
+        if admin_user_id == current_user_id: # if the user is admin
+            pass
+        else: #if the user is regular user
+            msg = "👜회원님의 보유아이템👜:\n"
+            inventory = db.get_inventory(str(current_user_id))
+
+            for i, item in enumerate(inventory):
+                msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
+            await update.message_update_text(msg)
+
+
     
     @staticmethod
     async def openbox(self):
