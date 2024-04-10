@@ -37,6 +37,8 @@ help_content_for_admin_user ="""
                 """
 
 
+
+
 '''
 <h1>CommandHandler</h1>
 This class provides command functionality based on user type.
@@ -86,25 +88,38 @@ class CommandCollection:
             if await db.transfer_currency(current_user_id,recipient_user_id,amount):
                 await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
             else:
-                await update.message.update_text("잔액이 부족합니다.")
+                await update.message.reply_text("잔액이 부족합니다.")
         else:
-            await update.message.update_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
+            await update.message.reply_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
 
 
     @staticmethod
     async def inventory(update:Update, context: ContextTypes.DEFAULT_TYPE):
-        admin_user_id = await get_admin_user_id()
+        admin_user_id = await get_admin_user_id(update,context)
         current_user_id = current_user_id = update.message.from_user["id"]
 
         if admin_user_id == current_user_id: # if the user is admin
-            pass
+            splitted_message = update.message.text.split(" ")
+            if (len(splitted_message) > 1):
+                if (splitted_message[1].isnumeric() == False):
+                    await update.message.reply_text("유효한 사용자 ID를 다음 형식으로 제공하십시오:\n /inventory <user_id>")
+
+                user_id = splitted_message[1]
+                msg = db.get_inventory_of_a_user(user_id)
+                await update.message.reply_text(msg)
+            else:
+                await update.message.reply_text("유효한 사용자 ID를 다음 형식으로 제공하십시오:\n /inventory <user_id>")
+
         else: #if the user is regular user
             msg = "👜회원님의 보유아이템👜:\n"
             inventory = db.get_inventory(str(current_user_id))
-
-            for i, item in enumerate(inventory):
-                msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
-            await update.message_update_text(msg)
+            
+            if (db.is_inventory_available_for_user(str(current_user_id))):
+                for i, item in enumerate(inventory):
+                    msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
+                await update.message.reply_text(msg)
+            else:
+                await update.message.reply_text("인벤토리가 비어있습니다.")
 
 
     

@@ -105,3 +105,27 @@ class DataBase:
                 inventory[name] = 1
 
         return inventory
+    
+    def is_inventory_available_for_user(self,user_id):
+        users = json.loads(self.db.get("users"))
+
+        if len(users[user_id]["inventory"]) == 0:
+            return False
+        else:
+            True
+
+    def get_inventory_of_a_user(self,user_id:str):
+        users = json.loads(self.db.get("users"))
+        
+        inventory = {}
+        for item in users[user_id]["inventory"]:
+            name = item["name"]
+            if name in inventory:
+                inventory[name] += 1
+            else:
+                inventory[name] = 1
+        msg = f"{user_id}의 인벤토리:\n"
+        for i, item in enumerate(inventory):
+            msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
+
+        return msg
