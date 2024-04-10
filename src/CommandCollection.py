@@ -2,6 +2,8 @@ from telegram.ext import CommandHandler, ContextTypes
 from telegram import Update,User
 from src.Util import *
 
+from . import db
+
 help_content_for_regular_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
                 /help - 명령어 도움말을 실행합니다.
@@ -47,18 +49,7 @@ class CommandCollection:
 
     @staticmethod
     async def help(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-        # getting the admin user id
-        # data = await context.bot.getChatAdministrators(update.message.chat.id)
-        # admin_user_id = 0
-        # for x in data:
-        #     if x.status == "creator":
-        #         admin_user_id = x.user.id
-        #         break
-        # print(data[1].status)
-        # print(data[1].user.id)
-
         admin_user_id = await get_admin_user_id(update,context)
-
 
         current_user_id = update.message.from_user["id"]
         if (current_user_id == admin_user_id):
@@ -75,8 +66,13 @@ class CommandCollection:
 
 
     @staticmethod
-    async def balance(self):
-        pass
+    async def balance(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
+        balance = db.get_balance(str(current_user_id))
+        await update.message.reply_text(f"보유 잔액은 {balance} 원입니다")
 
     @staticmethod
     async def transfer(self, telegram_id, amount):
@@ -92,9 +88,19 @@ class CommandCollection:
 
     # Admin specific command section started
     @staticmethod
-    async def addbalance(user_id, amount):
-        # Logic for the /addbalance command
-        pass
+    async def addbalance(update:Update,context:ContextTypes.DEFAULT_TYPE) -> None:
+        admin_user_id = await get_admin_user_id(update,context)
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
+        if (admin_user_id == current_user_id):
+            msg_text_splitted = update.message.text.split(" ")
+            recipient_user_id = msg_text_splitted[1]
+            balance = msg_text_splitted[2]
+
+            db.add_balance(str(recipient_user_id),balance)
+            await update.message.reply_text(f"Successfully added {balance} to {recipient_user_id}")
 
     @staticmethod
     async def addbox():
