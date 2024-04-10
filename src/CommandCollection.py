@@ -147,11 +147,13 @@ class CommandCollection:
 
     @staticmethod
     async def addbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
+        admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
 
-        session_handler.init_user_session(str(current_user_id),"addbox")
-        await update.message.reply_text("고유 ID를 입력하세요.")
+        if (admin_user_id == current_user_id):
+            session_handler.init_user_session(str(current_user_id),"addbox")
+            await update.message.reply_text("고유 ID를 입력하세요.")
         
 
 
