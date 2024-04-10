@@ -157,8 +157,13 @@ class CommandCollection:
 
     @staticmethod
     async def showboxes(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /showboxes command
-        pass
+        admin_user_id = await get_admin_user_id(update,context)
+        current_user_id = update.message.from_user["id"]
+
+        if (admin_user_id == current_user_id):
+            msg = db.get_boxes_info_as_msg()
+            await update.message.reply_text(msg)    
+
 
     @staticmethod
     async def additem(update:Update,context:ContextTypes.DEFAULT_TYPE):
@@ -192,8 +197,28 @@ class CommandCollection:
 
     @staticmethod
     async def deletebox(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /deletebox command
-        pass
+        admin_user_id = await get_admin_user_id(update,context)
+        current_user_id = update.message.from_user["id"]
+
+        if (admin_user_id == current_user_id):
+            splitted_msg = update.message.text.split(" ")
+            if (len(splitted_msg) == 1):
+                await update.message.reply_text("Box id is missing. Please try again")
+            if (len(splitted_msg) == 2):
+                if not splitted_msg[1].isnumeric():
+                    await update.message.reply_text("유효하지 않은 박스 ID입니다.")
+                else:
+                    # here need to write code
+                    
+                    if db.is_box_exists(splitted_msg[1]):
+                        db.delete_box(splitted_msg[1])
+                        await update.message.reply_text(f"Successfully deleted box {splitted_msg[1]}")
+                    else:
+                        await update.message.reply_text("The box has no existence. Please try with a valid box id.")
+
+            if (len(splitted_msg) > 2):
+                await update.message.reply_text("Please provide a valid box ID in the following format:\n /deletebox <box_id>")
+            # db.is_box_exists(box_id)
 
     @staticmethod
     async def regular_message(update:Update,context : ContextTypes.DEFAULT_TYPE):

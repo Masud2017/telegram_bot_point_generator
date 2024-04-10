@@ -143,5 +143,19 @@ class DataBase:
         if box_id not in boxes:
             boxes.update(box)
         self.db.set("boxes", json.dumps(boxes))    
-        
+
+    def get_boxes_info_as_msg(self):
+        boxes = json.loads(self.db.get("boxes"))
+
+        msg = "📦오픈 가능한 박스📦\n\n"
+        for i, box_id in enumerate(boxes):
+            msg += f"{i+1}: {boxes[box_id]['name']} - {boxes[box_id]['price']} 포인트\n{boxes[box_id]['description']}\n\n"
+
+        return msg
+    def delete_box(self,box_id:str):
+        boxes = json.loads(self.db.get("boxes"))
+
+        if box_id in boxes:
+            boxes.pop(box_id)       
+            self.db.set("boxes", json.dumps(boxes))
         
