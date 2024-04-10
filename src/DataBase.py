@@ -129,3 +129,19 @@ class DataBase:
             msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
 
         return msg
+    def is_box_exists(self,box_id:str):
+        boxes = json.loads(self.db.get("boxes"))
+
+        if box_id in boxes:
+            return True
+        else:
+            return False
+        
+    def save_box_item_to_db(self,box_id,box):
+        boxes = json.loads(self.db.get("boxes"))
+
+        if box_id not in boxes:
+            boxes.update(box)
+        self.db.set("boxes", json.dumps(boxes))    
+        
+        

@@ -1,6 +1,8 @@
-from telegram.ext import CommandHandler, ContextTypes
+from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 from telegram import Update,User
 from src.Util import *
+from src.SessionHandler import SessionHandler
+from src.SessionCommandHandler import SessionedCommandHandler
 
 from . import db
 
@@ -144,50 +146,73 @@ class CommandCollection:
             await update.message.reply_text(f"Successfully added {balance} to {recipient_user_id}")
 
     @staticmethod
-    async def addbox():
-        # Logic for the /addbox command
-        pass
+    async def addbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
+        session_handler = SessionHandler()
+        current_user_id = update.message.from_user["id"]
+
+        session_handler.init_user_session(str(current_user_id),"addbox")
+        await update.message.reply_text("고유 ID를 입력하세요.")
+        
+
 
     @staticmethod
-    async def showboxes():
+    async def showboxes(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /showboxes command
         pass
 
     @staticmethod
-    async def additem():
+    async def additem(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /additem command
         pass
 
     @staticmethod
-    async def showitems(box_id):
+    async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /showitems command
         pass
 
     @staticmethod
-    async def unlistitem(box_id, item_name):
+    async def unlistitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /unlistitem command
         pass
 
     @staticmethod
-    async def withdrawitem(user_id, item_name, quantity):
+    async def withdrawitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /withdrawitem command
         pass
 
     @staticmethod
-    async def editprobability(box_id, item_name, probability):
+    async def editprobability(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /editprobability command
         pass
 
     @staticmethod
-    async def editbox():
+    async def editbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /editbox command
         pass
 
     @staticmethod
-    async def deletebox(box_id):
+    async def deletebox(update:Update,context:ContextTypes.DEFAULT_TYPE):
         # Logic for the /deletebox command
         pass
 
+    @staticmethod
+    async def regular_message(update:Update,context : ContextTypes.DEFAULT_TYPE):
+        session_handler = SessionHandler()
+        session_command_handler = SessionedCommandHandler()
+        current_user_id = update.message.from_user["id"]
+
+        if session_handler.is_user_using_sessioned_command(str(current_user_id)):
+            # message = update.message.text
+            # if (message.isnumeric()):
+            #     session_handler.update_session(str(current_user_id),int(message),True)
+            await session_command_handler.start_handling(update,context,str(current_user_id))
+            # else:
+            #     await update.message.reply_text("While you are using a sessioned command you are not allowed to use any other commands.")
+        else:
+            pass
+        
+
+# list of command handlers with their subsequent commands
 help_command = CommandHandler("help", CommandCollection.help)
 myid_command = CommandHandler("myid", CommandCollection.myid)
 balance_command = CommandHandler("balance", CommandCollection.balance)
@@ -204,3 +229,4 @@ withdrawitem_command = CommandHandler("withdrawitem", CommandCollection.withdraw
 editprobability_command = CommandHandler("editprobability", CommandCollection.editprobability)
 editbox_command = CommandHandler("editbox", CommandCollection.editbox)
 deletebox_command = CommandHandler("deletebox", CommandCollection.deletebox)
+message_handler = MessageHandler(filters.ALL,CommandCollection.regular_message)

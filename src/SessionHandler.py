@@ -12,7 +12,8 @@ class SessionHandler(object):
         session_item = {
             "user_id":user_id,
             "phase":1,
-            "command_name": command_name
+            "command_name": command_name,
+            "item_id":0
         }
         user_session.append(session_item)
     
@@ -31,7 +32,7 @@ class SessionHandler(object):
             
         return False
     
-    def update_session(self,user_id:str):
+    def update_session(self,user_id:str,item_id:int = 0,update_item_id = False):
         session = {}
         idx = 0
         for session_item in user_session:
@@ -40,7 +41,16 @@ class SessionHandler(object):
                 idx = user_session.index(session_item)
 
         session["phase"] += 1
+        if (update_item_id):
+            session["item_id"] = item_id
         session_item[idx] = session
+
+    def get_user_session_obj(self,user_id:str):
+        for session_item in user_session:
+            if (user_id == session_item["user_id"]):
+                return session_item
+                
+
 
     def get_session_obj(self):
         return user_session
