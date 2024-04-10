@@ -38,5 +38,5 @@ class TestSessionHandler(unittest.TestCase):
         session = self.session_handler.get_session_obj()
         
         self.assertEqual(0,len(session))
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
