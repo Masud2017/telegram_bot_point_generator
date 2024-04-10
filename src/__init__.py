@@ -13,4 +13,4 @@ else :
 print(db_url)
 db = DataBase(db_url)
 
-user_session = dict()
+user_session = list()
