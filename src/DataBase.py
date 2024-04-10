@@ -30,7 +30,6 @@ class DataBase:
         else:
             boxes = json.loads(boxes_str.decode("utf-8"))
 
-
     def init_users(self,user_id:str, message):
         users = json.loads(self.db.get("users"))
         print(message)
@@ -69,9 +68,27 @@ class DataBase:
                 "first_name": "Unknown",
                 "last_name": "Unknown",
                 "username": "Unknown",
-                "balance": amount,
+                "balance": balance,
                 "inventory": []
             }
         self.update_record("users",users)
     
+    async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int):
+        users = json.loads(self.db.get("users"))
+        if amount < 0: return False
+        if users[sender_id]["balance"] >= amount:
+            users[sender_id]["balance"] -= amount
+            users[receiver_id]["balance"] += amount
+            
+            self.db.set("users", json.dumps(users))
+            return True
+        return False
     
+
+    def is_user_exist(self,user_id:str):
+        users = json.loads(self.db.get("users"))
+        
+        if user_id in users:
+            return True
+        else:
+            False

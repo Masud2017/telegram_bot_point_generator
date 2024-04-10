@@ -75,8 +75,20 @@ class CommandCollection:
         await update.message.reply_text(f"보유 잔액은 {balance} 원입니다")
 
     @staticmethod
-    async def transfer(self, telegram_id, amount):
-        pass
+    async def transfer(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        splitted_message = update.message.text.split(" ")
+        recipient_user_id = splitted_message[1]
+        amount = int(splitted_message[2])
+        current_user_id = str(update.message.from_user["id"])
+
+        if (db.is_user_exist(recipient_user_id)):
+            if await db.transfer_currency(current_user_id,recipient_user_id,amount):
+                await update.message_reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+            else:
+                await update.message_update_text("잔액이 부족합니다.")
+        else:
+            await update.message_update_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
+
 
     @staticmethod
     async def inventory(self):
@@ -99,7 +111,7 @@ class CommandCollection:
             recipient_user_id = msg_text_splitted[1]
             balance = msg_text_splitted[2]
 
-            db.add_balance(str(recipient_user_id),balance)
+            db.add_balance(str(recipient_user_id),int(balance))
             await update.message.reply_text(f"Successfully added {balance} to {recipient_user_id}")
 
     @staticmethod
