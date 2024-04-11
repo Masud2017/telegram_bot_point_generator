@@ -204,4 +204,47 @@ class DataBase:
 
         self.db.set("boxes", json.dumps(boxes))
 
+    def get_all_boxes_for_unlistitem(self):
+        boxes = json.loads(self.db.get("boxes"))
+        msg = ""
+        for i, box_id in enumerate(boxes):
+            msg += f"{i+1}: {boxes[box_id]['name']} box id : {box_id}\n"
+        msg += "\n박스를 선택하기 위해 박스의 아이디를 적어주세요, 전체의 경우 \"all\"을 적어주세요."
+
+        return msg
+    
+    def is_boxes_empty(self):
+        boxes = json.loads(self.db.get("boxes"))
+
+        if (len(boxes) == 0):
+            return True
+        else:
+            return False
         
+    def get_all_boxes(self):
+        return json.loads(self.db.get("boxes"))
+
+    def deduct_balance(self,box_id:str,user_id:str):
+        users = json.loads(self.db.get("users"))
+        boxes = json.loads(self.db.get("boxes"))
+
+        if self.is_user_exist(user_id):
+            if self.is_box_exists(box_id):
+                if users[user_id]["balance"] >= boxes[box_id]["price"]:
+                    users[user_id]["balance"] -= boxes[box_id]["price"]
+
+                    self.db.set("users", json.dumps(users))
+                    return True
+                else:
+                    return False
+
+        
+    def add_random_item_to_user_inventory(self,user_id,random_item):
+        users = json.loads(self.db.get("users"))
+
+        if self.is_user_exist(user_id):
+            users[user_id]["inventory"].append(random_item)
+            self.db.set("users", json.dumps(users))
+            return True
+        else:
+            return False

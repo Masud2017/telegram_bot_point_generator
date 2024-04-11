@@ -126,8 +126,18 @@ class CommandCollection:
 
     
     @staticmethod
-    async def openbox(self):
-        pass
+    async def openbox(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        session_handler = SessionHandler()
+        current_user_id = update.message.from_user["id"]
+
+        if not db.is_boxes_empty():
+            msg = db.get_boxes_info_as_msg()
+            msg += "\n✅원하는 박스의 아이디를 적어주세요 !"
+            session_handler.init_user_session(str(current_user_id),"openbox")
+            await update.message.reply_text(msg)
+
+        else:
+            await update.message.reply_text("📦오픈 가능한 박스가 없습니다📦")
 
     # Admin specific command section started
     @staticmethod
@@ -193,8 +203,13 @@ class CommandCollection:
 
     @staticmethod
     async def unlistitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /unlistitem command
-        pass
+        admin_user_id = await get_admin_user_id(update,context)
+        session_handler = SessionHandler()
+        current_user_id = update.message.from_user["id"]
+
+        if (admin_user_id == current_user_id):
+            session_handler.init_user_session(str(current_user_id),"unlistitem")
+            await update.message.reply_text("Please enter item name to unlist.")
 
     @staticmethod
     async def withdrawitem(update:Update,context:ContextTypes.DEFAULT_TYPE):

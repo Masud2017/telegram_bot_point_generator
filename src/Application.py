@@ -2,6 +2,8 @@ from src.CommandCollection import *
 from src.DataBase import DataBase
 from telegram.ext import ApplicationBuilder
 
+
+
 class Application:
     def __init__(self,telegram_token):
         self.app = ApplicationBuilder().token(telegram_token).build()
@@ -25,5 +27,6 @@ class Application:
         self.app.add_handler(editbox_command)
         self.app.add_handler(deletebox_command)
         self.app.add_handler(message_handler)
+
 
         self.app.run_polling()
