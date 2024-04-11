@@ -53,6 +53,10 @@ class CommandCollection:
 
     @staticmethod
     async def help(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
         admin_user_id = await get_admin_user_id(update,context)
 
         current_user_id = update.message.from_user["id"]
@@ -63,6 +67,10 @@ class CommandCollection:
 
     @staticmethod
     async def myid(update:Update, context: ContextTypes.DEFAULT_TYPE):
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+        
         user_id = update.message.from_user["id"]
         
         print(update.message)
@@ -80,10 +88,12 @@ class CommandCollection:
 
     @staticmethod
     async def transfer(update:Update, context: ContextTypes.DEFAULT_TYPE):
+
         splitted_message = update.message.text.split(" ")
         recipient_user_id = splitted_message[1]
         amount = int(splitted_message[2])
         current_user_id = str(update.message.from_user["id"])
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
         
 
         if (db.is_user_exist(recipient_user_id)):
@@ -97,8 +107,10 @@ class CommandCollection:
 
     @staticmethod
     async def inventory(update:Update, context: ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         current_user_id = current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if admin_user_id == current_user_id: # if the user is admin
             splitted_message = update.message.text.split(" ")
@@ -127,8 +139,10 @@ class CommandCollection:
     
     @staticmethod
     async def openbox(update:Update, context: ContextTypes.DEFAULT_TYPE):
+
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if not db.is_boxes_empty():
             msg = db.get_boxes_info_as_msg()
@@ -142,8 +156,10 @@ class CommandCollection:
     # Admin specific command section started
     @staticmethod
     async def addbalance(update:Update,context:ContextTypes.DEFAULT_TYPE) -> None:
+
         admin_user_id = await get_admin_user_id(update,context)
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
@@ -157,9 +173,11 @@ class CommandCollection:
 
     @staticmethod
     async def addbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             session_handler.init_user_session(str(current_user_id),"addbox")
@@ -169,8 +187,10 @@ class CommandCollection:
 
     @staticmethod
     async def showboxes(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             msg = db.get_boxes_info_as_msg()
@@ -179,9 +199,11 @@ class CommandCollection:
 
     @staticmethod
     async def additem(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             session_handler.init_user_session(str(current_user_id),"additem")
@@ -189,6 +211,10 @@ class CommandCollection:
 
     @staticmethod
     async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
         splitted_message = update.message.text.split(" ")
         if len(splitted_message) == 2:
             if (splitted_message[1].isnumeric()):
@@ -203,9 +229,11 @@ class CommandCollection:
 
     @staticmethod
     async def unlistitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             session_handler.init_user_session(str(current_user_id),"unlistitem")
@@ -213,11 +241,35 @@ class CommandCollection:
 
     @staticmethod
     async def withdrawitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /withdrawitem command
-        pass
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
+        splitted_message = update.message.text.split(" ")
+        if len(splitted_message) == 4:
+            user_id = splitted_message[1]
+            item_name = splitted_message[2]
+            quantity = splitted_message[3]
+            if user_id.isnumeric():
+                if quantity.isnumeric():
+                    quantity = int(quantity)
+                    if db.withdraw_item_from_inventory(user_id,quantity,item_name):
+                        await update.message.reply_text(f"Successfully withdrawn {quantity} {item_name} from {user_id}")
+                    else:
+                        await update.message.reply_text("Something went wrong while trying to withdrawing the item from user inventory.")
+                else:
+                    await update.message.reply_text("Please enter a valid quantity number.")
+            else:
+                await update.message.reply_text("Please enter a valid user id.")
+        else:
+            await update.message.reply_text("Please provide a valid user ID, item name, and quantity in the following format:\n /withdrawitem <user_id> <item_name> <quantity>")
 
     @staticmethod
     async def editprobability(update:Update,context:ContextTypes.DEFAULT_TYPE):
+        current_user_id = update.message.from_user["id"]
+
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
         splitted_message = update.message.text.split(" ")
         if (len(splitted_message) == 4):
             box_id = splitted_message[1]
@@ -242,9 +294,11 @@ class CommandCollection:
 
     @staticmethod
     async def editbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             session_handler.init_user_session(str(current_user_id),"editbox")
@@ -253,8 +307,10 @@ class CommandCollection:
 
     @staticmethod
     async def deletebox(update:Update,context:ContextTypes.DEFAULT_TYPE):
+
         admin_user_id = await get_admin_user_id(update,context)
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
             splitted_msg = update.message.text.split(" ")
@@ -278,9 +334,11 @@ class CommandCollection:
 
     @staticmethod
     async def regular_message(update:Update,context : ContextTypes.DEFAULT_TYPE):
+
         session_handler = SessionHandler()
         session_command_handler = SessionedCommandHandler()
         current_user_id = update.message.from_user["id"]
+        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if session_handler.is_user_using_sessioned_command(str(current_user_id)):
             # message = update.message.text

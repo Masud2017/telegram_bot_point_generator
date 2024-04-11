@@ -61,16 +61,10 @@ class DataBase:
         
     def add_balance(self,user_id:str,balance:int):
         users = json.loads(self.db.get("users"))
-        if user_id in users:
+        user_id = str(user_id).strip()
+        if self.is_user_exist(str(user_id)):
             users[user_id]["balance"] += balance
-        else:
-            users[str(user_id)] = {
-                "first_name": "Unknown",
-                "last_name": "Unknown",
-                "username": "Unknown",
-                "balance": balance,
-                "inventory": []
-            }
+       
         self.update_record("users",users)
     
     async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int):
@@ -245,6 +239,24 @@ class DataBase:
         if self.is_user_exist(user_id):
             users[user_id]["inventory"].append(random_item)
             self.db.set("users", json.dumps(users))
+            return True
+        else:
+            return False
+        
+    def withdraw_item_from_inventory(self,user_id,quantity,item_name):
+        users = json.loads(self.db.get("users"))
+
+        if self.is_user_exist(user_id):
+            if (quantity > len(users[user_id]["inventory"])):
+                users[user_id]["inventory"].clear()
+            else:
+                for _ in range(quantity):
+                    for item in users[user_id]["inventory"]:
+                        if item["name"] == item_name:
+                            users[user_id]["inventory"].remove(item)
+                            break
+            self.update_record("users",users)
+
             return True
         else:
             return False
