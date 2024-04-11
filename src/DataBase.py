@@ -180,3 +180,15 @@ class DataBase:
         boxes[str(box_id)]["items"].append(item)
         print("boxes : ",boxes[str(box_id)])
         self.db.set("boxes", json.dumps(boxes))
+
+    def get_items_info_as_msg(self,box_id):
+        boxes = json.loads(self.db.get("boxes"))
+        msg = ""
+        if box_id in boxes:
+            msg = f"Items in box {box_id}:\n"
+            for i, item in enumerate(boxes[box_id]["items"]):
+                msg += f"{i+1}: {item['name']} - Probability: {item['probability']}%\n"
+        else:
+            msg = "The box id does not exists."
+
+        return msg

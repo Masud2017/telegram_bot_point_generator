@@ -179,8 +179,17 @@ class CommandCollection:
 
     @staticmethod
     async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /showitems command
-        pass
+        splitted_message = update.message.text.split(" ")
+        if len(splitted_message) > 1:
+            if (splitted_message[1].isnumeric()):
+                box_id = splitted_message[1]
+                msg = db.get_items_info_as_msg(box_id)
+                await update.message.reply_text(msg)
+            else:
+                await update.message.reply_text("Please enter a valid box id.")
+        else:
+            await update.message.reply_text("Please provide a valid box ID in the following format:\n /showitems <box_id>")
+        
 
     @staticmethod
     async def unlistitem(update:Update,context:ContextTypes.DEFAULT_TYPE):
