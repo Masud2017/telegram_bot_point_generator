@@ -171,3 +171,12 @@ class DataBase:
         boxes[str(box_id)]["description"] = box[box_id]["description"]
         
         self.db.set("boxes", json.dumps(boxes))
+
+    def add_item_item_to_db(self,box_id,item):
+        boxes = json.loads(self.db.get("boxes"))
+
+    
+        
+        boxes[str(box_id)]["items"].append(item)
+        print("boxes : ",boxes[str(box_id)])
+        self.db.set("boxes", json.dumps(boxes))

@@ -169,8 +169,13 @@ class CommandCollection:
 
     @staticmethod
     async def additem(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /additem command
-        pass
+        admin_user_id = await get_admin_user_id(update,context)
+        session_handler = SessionHandler()
+        current_user_id = update.message.from_user["id"]
+
+        if (admin_user_id == current_user_id):
+            session_handler.init_user_session(str(current_user_id),"additem")
+            await update.message.reply_text("Please enter box ID")
 
     @staticmethod
     async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
