@@ -192,3 +192,16 @@ class DataBase:
             msg = "The box id does not exists."
 
         return msg
+    
+    def update_item_info(self,box_id:str,item_name,probability):
+        boxes = json.loads(self.db.get("boxes"))
+
+        print(boxes[box_id]["items"])
+        for x_item in boxes[box_id]["items"]:
+
+            if item_name == x_item["name"]:
+                x_item["probability"] = probability
+
+        self.db.set("boxes", json.dumps(boxes))
+
+        

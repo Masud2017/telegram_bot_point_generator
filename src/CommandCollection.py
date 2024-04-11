@@ -180,7 +180,7 @@ class CommandCollection:
     @staticmethod
     async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
         splitted_message = update.message.text.split(" ")
-        if len(splitted_message) > 1:
+        if len(splitted_message) == 2:
             if (splitted_message[1].isnumeric()):
                 box_id = splitted_message[1]
                 msg = db.get_items_info_as_msg(box_id)
@@ -203,8 +203,27 @@ class CommandCollection:
 
     @staticmethod
     async def editprobability(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /editprobability command
-        pass
+        splitted_message = update.message.text.split(" ")
+        if (len(splitted_message) == 4):
+            box_id = splitted_message[1]
+            item_name = splitted_message[2]
+            probability = splitted_message[3]
+
+            if (box_id.isnumeric()):
+                if not db.is_box_exists(box_id):
+                    await update.message.reply_text("Sorry the box id does not exist")
+                    return
+                
+                if (probability.isnumeric()):
+                    db.update_item_info(str(box_id),item_name,probability)
+                    await update.message.reply_text(f"Successfully edited probability of {item_name} in box {box_id}")
+                else:
+                    await update.message.reply_text("Please enter a valid probability value.")
+            else:
+                await update.message.reply_text("Please enter a valid box id.")
+
+        else:
+            await update.message.reply_text("Please provide a valid box ID, item name, and probability in the following format:\n /editprobability <box_id> <item_name> <probability>")
 
     @staticmethod
     async def editbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
