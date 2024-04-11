@@ -149,7 +149,7 @@ class DataBase:
 
         msg = "📦오픈 가능한 박스📦\n\n"
         for i, box_id in enumerate(boxes):
-            msg += f"{i+1}: {boxes[box_id]['name']} - {boxes[box_id]['price']} 포인트\n{boxes[box_id]['description']}\n\n"
+            msg += f"{i+1}: {boxes[box_id]['name']} - {boxes[box_id]['price']} 포인트\n{boxes[box_id]['description']}\n box id {box_id}\n"
 
         return msg
     def delete_box(self,box_id:str):
@@ -158,4 +158,16 @@ class DataBase:
         if box_id in boxes:
             boxes.pop(box_id)       
             self.db.set("boxes", json.dumps(boxes))
+
+    def update_box_item_to_db(self,box_id,box):
+        boxes = json.loads(self.db.get("boxes"))        
+
+        print("Inspecting the box object",boxes)
+
+        # if box_id in boxes:
+            
+        boxes[str(box_id)]["name"] = box[box_id]["name"]
+        boxes[str(box_id)]["price"] = box[box_id]["price"]
+        boxes[str(box_id)]["description"] = box[box_id]["description"]
         
+        self.db.set("boxes", json.dumps(boxes))

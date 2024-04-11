@@ -194,8 +194,14 @@ class CommandCollection:
 
     @staticmethod
     async def editbox(update:Update,context:ContextTypes.DEFAULT_TYPE):
-        # Logic for the /editbox command
-        pass
+        admin_user_id = await get_admin_user_id(update,context)
+        session_handler = SessionHandler()
+        current_user_id = update.message.from_user["id"]
+
+        if (admin_user_id == current_user_id):
+            session_handler.init_user_session(str(current_user_id),"editbox")
+            msg = db.get_boxes_info_as_msg()
+            await update.message.reply_text(msg)
 
     @staticmethod
     async def deletebox(update:Update,context:ContextTypes.DEFAULT_TYPE):
