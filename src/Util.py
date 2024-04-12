@@ -43,7 +43,9 @@ def extract_message(message,reason):
 
     elif reason == "withdrawitem" or reason == "editprobability":
         print("Printing the value of message : ",message)
-        pattern = r"(\d+)\s+(.+)\s+([\d.]+)$"    
+        # pattern = r"(\d+)\s+(.+)\s+([\d.]+)$"    
+        pattern =  r'(\d+)\s+(.+)$'
+        
         result = re.match(pattern, message)
 
         if result:
