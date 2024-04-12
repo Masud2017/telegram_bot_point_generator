@@ -141,6 +141,7 @@ class DataBase:
 
     def get_boxes_info_as_msg(self):
         boxes = json.loads(self.db.get("boxes"))
+        boxes = sorted(boxes.items())
 
         msg = "📦오픈 가능한 박스📦\n\n"
         for i, box_id in enumerate(boxes):
