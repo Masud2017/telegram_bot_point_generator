@@ -29,6 +29,13 @@ def get_random_item(box):
     return random_item
 
 
+def is_float(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
 def extract_message(message,reason):
     command_len = len(message.split(" ")[0])
     message = message[command_len+1:]
@@ -54,7 +61,7 @@ def extract_message(message,reason):
             name = result.group(2)
             
             qty = result.group(3)
-            if qty.isfloat():
+            if is_float(qty):
                 return (int(box_id),name,float(qty))
             
             return (int(box_id),name,int(qty))
