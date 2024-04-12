@@ -125,15 +125,16 @@ class CommandCollection:
                 await update.message.reply_text("유효한 사용자 ID를 다음 형식으로 제공하십시오:\n /inventory <user_id>")
 
         else: #if the user is regular user
-            msg = "👜회원님의 보유아이템👜:\n"
-            inventory = db.get_inventory(str(current_user_id))
+            # msg = "👜회원님의 보유아이템👜:\n"
+            # inventory = db.get_inventory(str(current_user_id))
             
-            if (db.is_inventory_available_for_user(str(current_user_id))):
-                for i, item in enumerate(inventory):
-                    msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
-                await update.message.reply_text(msg)
-            else:
-                await update.message.reply_text("인벤토리가 비어있습니다.")
+            # if (db.is_inventory_available_for_user(str(current_user_id))):
+                # for i, item in enumerate(inventory):
+                #     msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
+            msg = db.get_inventory_of_a_user(str(current_user_id))
+            await update.message.reply_text(msg)
+            # else:
+            #     await update.message.reply_text("인벤토리가 비어있습니다.")
 
 
     
@@ -236,8 +237,27 @@ class CommandCollection:
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
-            session_handler.init_user_session(str(current_user_id),"unlistitem")
-            await update.message.reply_text("Please enter item name to unlist.")
+            # session_handler.init_user_session(str(current_user_id),"unlistitem")
+            # await update.message.reply_text("Please enter item name to unlist.")
+            splitted_message = update.message.text.split(" ")
+            if (len(splitted_message) == 3):
+                box_id = splitted_message[1]
+                item_name = splitted_message[2]
+                if (box_id.isnumeric()):
+                    if not db.is_box_exists(box_id):
+                        await update.message.reply_text("Invalid box id does not exists.")
+                        return 
+                    if db.remove_item_from_box(box_id,item_name):
+                        if db.withdraw_item_from_inventory(str(current_user_id),100000,item_name): # quantity is huge because all inventory item matching the name should be removed
+                            await update.message.reply_text(f"Unlisting the item : {item_name} is successfull.")
+                    else:
+                        await update.message.reply_text("Something went wrong while trying to remove the item from box.")
+                        return 
+                else:
+                    await update.message.reply_text("Invalid box id provided.")
+                    return
+            else:
+                await update.message.reply_text("Please write the command in this structure   /unlistitem <box_id> <item_name>")
 
     @staticmethod
     async def withdrawitem(update:Update,context:ContextTypes.DEFAULT_TYPE):

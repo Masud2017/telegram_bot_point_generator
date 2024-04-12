@@ -88,17 +88,17 @@ class DataBase:
             False
 
 
-    def get_inventory(self,user_id:str):
-        users = json.loads(self.db.get("users"))
-        inventory = {}
-        for item in users[user_id]["inventory"]:
-            name = item["name"]
-            if name in inventory:
-                inventory[name] += 1
-            else:
-                inventory[name] = 1
+    # def get_inventory(self,user_id:str):
+    #     users = json.loads(self.db.get("users"))
+    #     inventory = {}
+    #     for item in users[user_id]["inventory"]:
+    #         name = item["name"]
+    #         if name in inventory:
+    #             inventory[name] += 1
+    #         else:
+    #             inventory[name] = 1
 
-        return inventory
+    #     return inventory
     
     def is_inventory_available_for_user(self,user_id):
         users = json.loads(self.db.get("users"))
@@ -247,16 +247,29 @@ class DataBase:
         users = json.loads(self.db.get("users"))
 
         if self.is_user_exist(user_id):
-            if (quantity > len(users[user_id]["inventory"])):
-                users[user_id]["inventory"].clear()
-            else:
-                for _ in range(quantity):
-                    for item in users[user_id]["inventory"]:
-                        if item["name"] == item_name:
-                            users[user_id]["inventory"].remove(item)
-                            break
+            if quantity == None:
+                pass
+    
+            for _ in range(quantity):
+                for item in users[user_id]["inventory"]:
+                    if item["name"] == item_name:
+                        users[user_id]["inventory"].remove(item)
+                        break
             self.update_record("users",users)
 
             return True
         else:
             return False
+        
+    def remove_item_from_box(self,box_id,item_name):
+        boxes = json.loads(self.db.get("boxes"))
+        if self.is_box_exists(box_id):
+            for x_item in boxes[box_id]["items"]:
+                if item_name == x_item["name"]:
+                    boxes[box_id]["items"].remove(x_item)
+                    break
+            self.update_record("boxes",boxes)
+            return True
+
+        else:
+            False
