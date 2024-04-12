@@ -96,13 +96,16 @@ class CommandCollection:
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
         
 
-        if (db.is_user_exist(recipient_user_id)):
-            if await db.transfer_currency(current_user_id,recipient_user_id,amount):
-                await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+        if len(splitted_message) == 3:
+            if (db.is_user_exist(recipient_user_id)):
+                if await db.transfer_currency(current_user_id,recipient_user_id,amount):
+                    await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+                else:
+                    await update.message.reply_text("잔액이 부족합니다.")
             else:
-                await update.message.reply_text("잔액이 부족합니다.")
+                await update.message.reply_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
         else:
-            await update.message.reply_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
+            await update.message.reply_text("Invalid command please write command in this structure /transfer <user_id> <amount>.")
 
 
     @staticmethod
@@ -312,6 +315,7 @@ class CommandCollection:
 
             if (splitted_message[1].isnumeric()):
                 box_id = str(extracted_message[0])
+                box_id = db.get_box_id_by_sequence_no(box_id)
                 item_name = extracted_message[1]
                 probability = str(extracted_message[2])
                 if not db.is_box_exists(box_id):
