@@ -118,7 +118,8 @@ class DataBase:
                 inventory[name] += 1
             else:
                 inventory[name] = 1
-        msg = f"{user_id}의 인벤토리:\n"
+        msg = f"💼{user_id}님의 인벤토리💼\n"
+        
         for i, item in enumerate(inventory):
             msg += f"{i+1}: {item} - 수량: {inventory[item]}\n"
 

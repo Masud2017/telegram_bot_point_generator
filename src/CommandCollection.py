@@ -213,19 +213,22 @@ class CommandCollection:
     @staticmethod
     async def showitems(update:Update,context:ContextTypes.DEFAULT_TYPE):
         current_user_id = update.message.from_user["id"]
+        admin_user_id = await get_admin_user_id(update,context)
+
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
-        splitted_message = update.message.text.split(" ")
-        if len(splitted_message) == 2:
-            if (splitted_message[1].isnumeric()):
-                box_id = splitted_message[1]
-                msg = db.get_items_info_as_msg(box_id)
-                await update.message.reply_text(msg)
+        if (admin_user_id == current_user_id):
+            splitted_message = update.message.text.split(" ")
+            if len(splitted_message) == 2:
+                if (splitted_message[1].isnumeric()):
+                    box_id = splitted_message[1]
+                    msg = db.get_items_info_as_msg(box_id)
+                    await update.message.reply_text(msg)
+                else:
+                    await update.message.reply_text("Please enter a valid box id.")
             else:
-                await update.message.reply_text("Please enter a valid box id.")
-        else:
-            await update.message.reply_text("Please provide a valid box ID in the following format:\n /showitems <box_id>")
+                await update.message.reply_text("Please provide a valid box ID in the following format:\n /showitems <box_id>")
         
 
     @staticmethod
