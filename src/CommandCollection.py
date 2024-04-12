@@ -318,6 +318,7 @@ class CommandCollection:
                 box_id = db.get_box_id_by_sequence_no(box_id)
                 item_name = extracted_message[1]
                 probability = str(extracted_message[2])
+                print(item_name,probability)
                 if not db.is_box_exists(box_id):
                     await update.message.reply_text("Sorry the box id does not exist")
                     return
