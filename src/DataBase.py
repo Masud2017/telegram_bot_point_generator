@@ -143,7 +143,7 @@ class DataBase:
 
         msg = "📦오픈 가능한 박스📦\n\n"
         for i, box_id in enumerate(boxes):
-            msg += f"{i+1}: {boxes[box_id]['name']} - {boxes[box_id]['price']} 포인트\n{boxes[box_id]['description']}\n box id {box_id}\n"
+            msg += f"{i+1}: {boxes[box_id]['name']} - {boxes[box_id]['price']} 포인트\n{boxes[box_id]['description']}\n\n"
 
         return msg
     def delete_box(self,box_id:str):
@@ -273,3 +273,9 @@ class DataBase:
 
         else:
             False
+    def get_box_id_by_sequence_no(self,sequence_no):
+        boxes = json.loads(self.db.get("boxes"))
+        box_id = int(sequence_no)
+        if (box_id <= len(boxes.keys())):
+            box_id = list(boxes.keys())[int(box_id)-1]
+            return str(box_id)

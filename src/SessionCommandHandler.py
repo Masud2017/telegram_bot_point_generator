@@ -55,6 +55,7 @@ class SessionedCommandHandler:
         if len(session) > 0:
             if (session["phase"] == 1):
                 box_id = update.message.text
+                box_id = db.get_box_id_by_sequence_no(box_id)
                 if box_id.isnumeric():
                     if db.is_box_exists(box_id):
                        await update.message.reply_text("해당 박스의 아이디는 이미 존재합니다. 다른 아이디를 입력해주세요.")
@@ -121,6 +122,7 @@ class SessionedCommandHandler:
         if len(session) > 0:
             if (session["phase"] == 1):
                 box_id = update.message.text
+                box_id = db.get_box_id_by_sequence_no(box_id)
                 if box_id.isnumeric():
                     if not db.is_box_exists(box_id):
                        await update.message.reply_text("해당 상자의 ID가 존재하지 않습니다. 기존 상자 ID를 입력하세요.")
@@ -197,6 +199,7 @@ class SessionedCommandHandler:
         if len(session) > 0:
             if (session["phase"] == 1):
                 box_id = update.message.text
+                box_id = db.get_box_id_by_sequence_no(box_id)
                 if box_id.isnumeric():
                     if not db.is_box_exists(box_id):
                        await update.message.reply_text("해당 상자의 ID가 존재하지 않습니다. 기존 상자 ID를 입력하세요.")
@@ -218,62 +221,62 @@ class SessionedCommandHandler:
     # add item section ended
                 
     # unlistitem section started
-    async def handle_unlist_item_phase_choice(self,update:Update, context : ContextTypes.DEFAULT_TYPE,item,session,user_id:str):
-        box_id = session["item_id"]  
-        msg = update.message.reply_text
+    # async def handle_unlist_item_phase_choice(self,update:Update, context : ContextTypes.DEFAULT_TYPE,item,session,user_id:str):
+    #     box_id = session["item_id"]  
+    #     msg = update.message.reply_text
 
-        if (msg == "all"):
-            session["unlist_choice_all"] = "all"
-        else:
-            if not msg.isnumeric() and not db.is_box_exists(box_id):
-                await update.message.reply_text("유효하지 않은 박스 ID입니다.")
-                return
+    #     if (msg == "all"):
+    #         session["unlist_choice_all"] = "all"
+    #     else:
+    #         if not msg.isnumeric() and not db.is_box_exists(box_id):
+    #             await update.message.reply_text("유효하지 않은 박스 ID입니다.")
+    #             return
         
 
-        self.session_handler.update_session(user_id,box_id,update_item_id=True)
+    #     self.session_handler.update_session(user_id,box_id,update_item_id=True)
 
-        await update.message.reply_text("유저의 인벤토리에서 아이템을 제거할 수량을 적어주세요.")
+    #     await update.message.reply_text("유저의 인벤토리에서 아이템을 제거할 수량을 적어주세요.")
 
 
-    async def handle_unlist_item_phase_final(self, update:Update, context : ContextTypes.DEFAULT_TYPE,item,session,user_id:str):
-        count = update.message.text
-        if not update.message.text.isnumeric():
-            await update.message.reply_text("유효한 숫자를 입력해주세요.")
-            return
+    # async def handle_unlist_item_phase_final(self, update:Update, context : ContextTypes.DEFAULT_TYPE,item,session,user_id:str):
+    #     count = update.message.text
+    #     if not update.message.text.isnumeric():
+    #         await update.message.reply_text("유효한 숫자를 입력해주세요.")
+    #         return
     
-        item_name = ""
-        box_id = session["item_id"]  
-        count = int(count)
+    #     item_name = ""
+    #     box_id = session["item_id"]  
+    #     count = int(count)
 
-        try: 
-            probability  = int(update.message.text)
-            print("Probability : " ,session["item"])
+    #     try: 
+    #         probability  = int(update.message.text)
+    #         print("Probability : " ,session["item"])
 
-            item["probability"] = probability
-        except:
-            import traceback
-            traceback.print_exc()
-            await update.message.reply_text("올바른 확률 값을 입력하세요.")
-            return
-        self.session_handler.update_session(user_id,box_id,update_item_id=True)
-        await update.message.reply_text("박스 이미지를 보내주세요.")
+    #         item["probability"] = probability
+    #     except:
+    #         import traceback
+    #         traceback.print_exc()
+    #         await update.message.reply_text("올바른 확률 값을 입력하세요.")
+    #         return
+    #     self.session_handler.update_session(user_id,box_id,update_item_id=True)
+    #     await update.message.reply_text("박스 이미지를 보내주세요.")
 
-    async def handle_unlist_item(self,user_id:str,update:Update,context:ContextTypes.DEFAULT_TYPE):
-        session = self.session_handler.get_user_session_obj(user_id)
-        if "item" not in session:
-            session["item"] = {}
+    # async def handle_unlist_item(self,user_id:str,update:Update,context:ContextTypes.DEFAULT_TYPE):
+    #     session = self.session_handler.get_user_session_obj(user_id)
+    #     if "item" not in session:
+    #         session["item"] = {}
 
-        if len(session) > 0:
-            if (session["phase"] == 1):
+    #     if len(session) > 0:
+    #         if (session["phase"] == 1):
                 
-                    # self.session_handler.update_session(user_id,int(box_id),True)
-                msg = db.get_all_boxes_for_unlistitem()
-                await update.message.reply_text(msg)
+    #                 # self.session_handler.update_session(user_id,int(box_id),True)
+    #             msg = db.get_all_boxes_for_unlistitem()
+    #             await update.message.reply_text(msg)
                 
-            elif(session["phase"] == 2):
-                await self.handle_unlist_item_phase_choice(update,context,session["item"],session,user_id)
-            elif(session["phase"] == 3):
-                await self.handle_unlist_item_phase_final(update,context,session["item"],session,user_id)
+    #         elif(session["phase"] == 2):
+    #             await self.handle_unlist_item_phase_choice(update,context,session["item"],session,user_id)
+    #         elif(session["phase"] == 3):
+    #             await self.handle_unlist_item_phase_final(update,context,session["item"],session,user_id)
              
                 
     # unlistitem section ended        
@@ -295,6 +298,7 @@ class SessionedCommandHandler:
                        return
 
                     boxes = db.get_all_boxes()
+                    box_id = db.get_box_id_by_sequence_no(box_id)
                     box = boxes[box_id]
                     if len(box["items"]) == 0:
                         await update.message.reply_text("This box does not have any item. Please enter a box that contains at least one item.")
@@ -330,7 +334,7 @@ class SessionedCommandHandler:
         elif(user_session["command_name"] == "additem"):
             await self.handle_add_item(user_id,update,context)
 
-        elif(user_session["command_name"] == "unlistitem"):
-            await self.handle_unlist_item(user_id,update,context)
+        # elif(user_session["command_name"] == "unlistitem"):
+        #     await self.handle_unlist_item(user_id,update,context)
         elif(user_session["command_name"] == "openbox"):
             await self.handle_open_box(user_id,update,context)
