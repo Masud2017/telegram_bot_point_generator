@@ -273,7 +273,7 @@ class DataBase:
 
         else:
             False
-    def get_box_id_by_sequence_no(self,sequence_no):
+    def get_box_id_by_sequence_no(self,sequence_no:str):
         boxes = json.loads(self.db.get("boxes"))
         box_id = int(sequence_no)
         if (box_id <= len(boxes.keys())):
