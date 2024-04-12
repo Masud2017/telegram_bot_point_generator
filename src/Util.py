@@ -47,11 +47,13 @@ def extract_message(message,reason):
         # pattern =  r'(\d+)\s+(.+)$'
         
         result = re.match(pattern, message)
-
+        import logging
+        logging.info("value of result " ,result)
         if result:
             box_id = result.group(1)
             name = result.group(2)
             qty = result.group(3)
+            logging.info("(int(box_id),name,int(qty)), ",(int(box_id),name,int(qty)))
             return (int(box_id),name,int(qty))
         
     
