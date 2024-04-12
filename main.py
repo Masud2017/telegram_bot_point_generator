@@ -9,5 +9,6 @@ log = getLogger()
 load_dotenv()
 
 
-application = Application(os.environ["TELEGRAM_TOKEN"])
-application.start_application()
+if __name__ == "__main__":
+    application = Application(os.environ["TELEGRAM_TOKEN"])
+    application.start_application()
