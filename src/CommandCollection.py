@@ -323,7 +323,7 @@ class CommandCollection:
                     await update.message.reply_text("Sorry the box id does not exist")
                     return
                 
-                if (probability.isnumeric()):
+                if (probability.isnumeric() or is_float(probability)):
                     db.update_item_info(str(box_id),item_name,probability)
                     await update.message.reply_text(f"Successfully edited probability of {item_name} in box {box_id}")
                 else:
