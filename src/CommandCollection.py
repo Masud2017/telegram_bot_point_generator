@@ -239,11 +239,16 @@ class CommandCollection:
         if (admin_user_id == current_user_id):
             # session_handler.init_user_session(str(current_user_id),"unlistitem")
             # await update.message.reply_text("Please enter item name to unlist.")
-            splitted_message = update.message.text.split(" ")
-            if (len(splitted_message) == 3):
-                box_id = splitted_message[1]
-                item_name = splitted_message[2]
-                if (box_id.isnumeric()):
+            message = update.message.text
+            splitted_message = message.split(" ")
+            if (len(splitted_message) >= 3):
+                extracted_message = extract_message(message,"unlistitem")
+                
+
+                if (splitted_message[1].isnumeric()):
+                    box_id = str(extracted_message[0])
+                    item_name = extracted_message[1]
+
                     if not db.is_box_exists(box_id):
                         await update.message.reply_text("Invalid box id does not exists.")
                         return 
@@ -264,15 +269,20 @@ class CommandCollection:
         current_user_id = update.message.from_user["id"]
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+        message = update.message.text
+        splitted_message = message.split(" ")
+        if len(splitted_message) >= 4:
+            extracted_message = extract_message(message,"withdrawitem")
 
-        splitted_message = update.message.text.split(" ")
-        if len(splitted_message) == 4:
-            user_id = splitted_message[1]
-            item_name = splitted_message[2]
-            quantity = splitted_message[3]
-            if user_id.isnumeric():
+            
+            quantity = str(extracted_message[2])
+            if splitted_message[1].isnumeric():
                 if quantity.isnumeric():
+                    user_id = str(extracted_message[0])
+                    item_name = extracted_message[1]
                     quantity = int(quantity)
+                    
+                    
                     if db.withdraw_item_from_inventory(user_id,quantity,item_name):
                         await update.message.reply_text(f"Successfully withdrawn {quantity} {item_name} from {user_id}")
                     else:
@@ -290,13 +300,17 @@ class CommandCollection:
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
-        splitted_message = update.message.text.split(" ")
-        if (len(splitted_message) == 4):
-            box_id = splitted_message[1]
-            item_name = splitted_message[2]
-            probability = splitted_message[3]
+        message = update.message.text
+        splitted_message = message.split(" ")
 
-            if (box_id.isnumeric()):
+        if (len(splitted_message) >= 4):
+            extracted_message = extract_message(message,"editprobability")
+            
+
+            if (splitted_message[1].isnumeric()):
+                box_id = str(extracted_message[0])
+                item_name = extracted_message[1]
+                probability = str(extracted_message[2])
                 if not db.is_box_exists(box_id):
                     await update.message.reply_text("Sorry the box id does not exist")
                     return
