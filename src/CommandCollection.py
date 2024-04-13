@@ -181,6 +181,12 @@ class CommandCollection:
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+
+        session = session_handler.get_user_session_obj(str(current_user_id))
+        if session != None:
+            if session["phase"] > 1: # for fixing endless reply from bot
+                session_handler.remove_user_session(str(current_user_id))   
+
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
@@ -369,9 +375,9 @@ class CommandCollection:
                     await update.message.reply_text("유효하지 않은 박스 ID입니다.")
                 else:
                     # here need to write code
-                    
-                    if db.is_box_exists(splitted_msg[1]):
-                        db.delete_box(splitted_msg[1])
+                    box_id = db.get_box_id_by_sequence_no(splitted_msg[1])
+                    if db.is_box_exists(box_id):
+                        db.delete_box(box_id)
                         await update.message.reply_text(f"Successfully deleted box {splitted_msg[1]}")
                     else:
                         await update.message.reply_text("The box has no existence. Please try with a valid box id.")

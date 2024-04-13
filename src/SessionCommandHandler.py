@@ -188,7 +188,7 @@ class SessionedCommandHandler:
             # file_id = update.message.document.file_id
             
             
-            file_id = update.message.photo[0].file_id
+            file_id = update.message.photo[-1].file_id
             session["item"]["image"] = file_id
         # box[box_id]["description"] = update.message.text
             db.add_item_item_to_db(box_id,item)
