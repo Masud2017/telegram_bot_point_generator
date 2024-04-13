@@ -27,8 +27,10 @@ class TestSessionHandler(unittest.TestCase):
         self.assertTrue(actual)
 
     def test_update_session(self):
-        self.session_handler.update_session("1")
         session = self.session_handler.get_session_obj()
+        print(session)
+        self.session_handler.update_session("1")
+        print(session)
         
 
         self.assertEqual(session[0]["phase"],2)
