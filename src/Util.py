@@ -22,7 +22,7 @@ async def get_admin_user_id(update:Update,context:ContextTypes) -> None:
 
 def get_random_item(box):
     items = box["items"]
-    probabilities = [float(x_item["probability"]) if is_float(x_item["probability"]) else int(x_item["probability"]) for x_item in box["items"]]
+    probabilities = [float(x_item["probability"]) if is_float(str(x_item["probability"])) else int(x_item["probability"]) for x_item in box["items"]]
 
     random_item = SystemRandom().choices(population=items,weights=probabilities,k=1)[0]
 
