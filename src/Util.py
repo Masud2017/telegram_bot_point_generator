@@ -5,20 +5,22 @@ from telegram import constants
 import re
 
 async def get_admin_user_id(update:Update,context:ContextTypes) -> None:
-    data = await context.bot.getChatAdministrators(update.message.chat.id)
-    current_user_id = update.message.from_user["id"]
+    try:
+        data = await context.bot.getChatAdministrators(update.message.chat.id)
+        current_user_id = update.message.from_user["id"]
 
-    # print("printing the chat data  ",data)
-    admin_user_id = 0
-    for x in data:
-        
-        if x.status == constants.ChatMemberStatus.OWNER or x.status == constants.ChatMemberStatus.ADMINISTRATOR:
-            if x.user.id == current_user_id:
-                admin_user_id = x.user.id
-                break
-        
-    return admin_user_id
-
+        # print("printing the chat data  ",data)
+        admin_user_id = 0
+        for x in data:
+            
+            if x.status == constants.ChatMemberStatus.OWNER or x.status == constants.ChatMemberStatus.ADMINISTRATOR:
+                if x.user.id == current_user_id:
+                    admin_user_id = x.user.id
+                    break
+            
+        return admin_user_id
+    except:
+        return update.message.chat_id
 
 def get_random_item(box):
     items = box["items"]
