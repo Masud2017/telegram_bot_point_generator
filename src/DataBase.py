@@ -284,5 +284,6 @@ class DataBase:
         
     def get_an_unique_box_id(self):
         boxes = json.loads(self.db.get("boxes"))
-
+        if (len(boxes) == 0):
+            return "1"
         return (int(list(boxes)[-1]) + 1)
