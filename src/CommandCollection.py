@@ -207,7 +207,8 @@ class CommandCollection:
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
-        session = session_handler.get_session_obj(str(current_user_id))
+
+        session = session_handler.get_user_session_obj(str(current_user_id))
         if (session[0]["user_id"] == str(current_user_id)): # fix for endless reply from bot
             session_handler.remove_user_session(str(current_user_id)) 
 
