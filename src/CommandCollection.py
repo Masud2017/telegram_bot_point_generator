@@ -209,7 +209,7 @@ class CommandCollection:
         current_user_id = update.message.from_user["id"]
 
         session = session_handler.get_user_session_obj(str(current_user_id))
-        if (session["user_id"] == str(current_user_id)): # fix for endless reply from bot
+        if (len(session) == 0): # fix for endless reply from bot
             session_handler.remove_user_session(str(current_user_id)) 
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
