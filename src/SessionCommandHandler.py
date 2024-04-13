@@ -166,7 +166,8 @@ class SessionedCommandHandler:
                 probability = float(probability_str)
 
             elif probability_str.isnumeric():
-                probability  = int(update.message.text)
+                # probability  = int(update.message.text)
+                probability = int(probability_str)
             print("Probability : " ,session["item"])
 
             item["probability"] = probability
