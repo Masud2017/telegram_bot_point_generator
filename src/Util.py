@@ -29,11 +29,12 @@ def get_random_item(box):
     return random_item
 
 
-def is_float(num):
-    try:
-        float(num)
+def is_float(num:str):
+    pattern = r"^\d+\.\d+$"
+    result = re.match(pattern,num)
+    if result:
         return True
-    except ValueError:
+    else:
         return False
 
 def extract_message(message,reason):

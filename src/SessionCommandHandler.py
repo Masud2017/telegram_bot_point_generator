@@ -162,7 +162,7 @@ class SessionedCommandHandler:
         probability_str  = update.message.text
         try:
             probability = None
-            if is_float(probability):
+            if is_float(probability_str):
                 probability = float(probability_str)
 
             elif probability_str.isnumeric():
