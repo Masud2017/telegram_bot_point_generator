@@ -2,7 +2,7 @@ from src.SessionHandler import SessionHandler
 from telegram.ext import ContextTypes
 from telegram import Update
 from src import db
-from src.Util import get_random_item
+from src.Util import get_random_item,is_float
 
 class SessionedCommandHandler:
     def __init__(self):
@@ -159,8 +159,14 @@ class SessionedCommandHandler:
 
     async def handle_add_item_phase_probability(self, update:Update, context : ContextTypes.DEFAULT_TYPE,item,session,user_id:str):
         box_id = session["item_id"]  
-        try: 
-            probability  = int(update.message.text)
+        probability_str  = update.message.text
+        try:
+            probability = None
+            if is_float(probability):
+                probability = float(probability_str)
+
+            elif probability_str.isnumeric():
+                probability  = int(update.message.text)
             print("Probability : " ,session["item"])
 
             item["probability"] = probability
