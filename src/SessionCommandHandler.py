@@ -153,7 +153,7 @@ class SessionedCommandHandler:
         })
 
         self.session_handler.update_session(user_id,box_id,update_item_id=True)
-
+        print(self.session_handler.get_user_session_obj(user_id))
         await update.message.reply_text("아이템의 확률을 적어주세요.")
 
 
