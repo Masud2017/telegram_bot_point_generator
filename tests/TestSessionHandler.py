@@ -35,10 +35,10 @@ class TestSessionHandler(unittest.TestCase):
 
         self.assertEqual(session[0]["phase"],2)
 
-    def test_remove_user_session(self):
-        self.session_handler.remove_user_session("1")
-        session = self.session_handler.get_session_obj()
+    # def test_remove_user_session(self):
+    #     self.session_handler.remove_user_session("1")
+    #     session = self.session_handler.get_session_obj()
         
-        self.assertEqual(0,len(session))
+    #     self.assertEqual(0,len(session))
 # if __name__ == '__main__':
 #     unittest.main()

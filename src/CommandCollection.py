@@ -191,7 +191,8 @@ class CommandCollection:
 
         if (admin_user_id == current_user_id):
             session_handler.init_user_session(str(current_user_id),"addbox")
-            await update.message.reply_text("고유 ID를 입력하세요.")
+            
+            await update.message.reply_text("박스 이름을 적어주세요.")
         
 
 

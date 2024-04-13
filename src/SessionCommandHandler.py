@@ -9,20 +9,6 @@ class SessionedCommandHandler:
         self.session_handler = SessionHandler()
     
     # add box section started
-    async def handle_add_box_phase_name(self,update:Update, context : ContextTypes.DEFAULT_TYPE,box,session,user_id:str):
-        box_id = session["item_id"]  
-        box[box_id] = {
-                        "name": update.message.text,
-                        "description": None,
-                        "price": None,
-                        "items": []
-        }  
-
-        self.session_handler.update_session(user_id,box_id,update_item_id=True)
-
-        await update.message.reply_text("박스 오픈 금액을 적어주세요.")
-
-
     async def handle_add_box_phase_price(self, update:Update, context : ContextTypes.DEFAULT_TYPE,box,session,user_id:str):
         box_id = session["item_id"]  
         try: 
@@ -53,25 +39,23 @@ class SessionedCommandHandler:
             session["box"] = {}
 
         if len(session) > 0:
-            if (session["phase"] == 1):
-                box_id = update.message.text
-                
-                if box_id.isnumeric():
-                    if db.is_box_exists(box_id):
-                       await update.message.reply_text("해당 박스의 아이디는 이미 존재합니다. 다른 아이디를 입력해주세요.")
-                       self.session_handler.remove_user_session(user_id)
-                       return
+            if(session["phase"] == 1):
+                box_id = db.get_an_unique_box_id()
+                session["box"][box_id] = {
+                                "name": update.message.text,
+                                "description": None,
+                                "price": None,
+                                "items": []
+                }  
+                await update.message.reply_text("박스 오픈 금액을 적어주세요.")
 
-                    self.session_handler.update_session(user_id,int(box_id),True)
-                    await update.message.reply_text("박스 이름을 적어주세요.")
-                else:
-                    await update.message.reply_text("You need to provide an unique box id.")
             elif(session["phase"] == 2):
-                await self.handle_add_box_phase_name(update,context,session["box"],session,user_id)
-            elif(session["phase"] == 3):
                 await self.handle_add_box_phase_price(update,context,session["box"],session,user_id)
-            elif(session["phase"] == 4):
+            elif(session["phase"] == 3):
                 await self.handle_add_box_phase_description(update,context,session["box"],session,user_id)
+
+            self.session_handler.update_session(user_id,box_id,update_item_id=True)
+            
     # add box section ended
 
 
@@ -95,6 +79,7 @@ class SessionedCommandHandler:
         box_id = session["item_id"]  
         try: 
             price  = int(update.message.text)
+            
             print("VAelu of box : " ,box)
 
             box[box_id]["price"] = price

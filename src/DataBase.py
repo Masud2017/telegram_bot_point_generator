@@ -281,3 +281,8 @@ class DataBase:
         if (box_id <= len(boxes.keys())):
             box_id = list(boxes.keys())[int(box_id)-1]
             return str(box_id)
+        
+    def get_an_unique_box_id(self):
+        boxes = json.loads(self.db.get("boxes"))
+
+        return (int(list(boxes)[-1]) + 1)
