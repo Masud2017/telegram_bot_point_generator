@@ -146,6 +146,12 @@ class CommandCollection:
 
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+
+        session = session_handler.get_user_session_obj(str(current_user_id))
+        if session != None:
+            if session["phase"] > 1 or session["command_name"] != "openbox" : # for fixing endless reply from bot
+                session_handler.remove_user_session(str(current_user_id))   
+
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if not db.is_boxes_empty():
@@ -184,7 +190,7 @@ class CommandCollection:
 
         session = session_handler.get_user_session_obj(str(current_user_id))
         if session != None:
-            if session["phase"] > 1: # for fixing endless reply from bot
+            if session["phase"] > 1 or session["command_name"] != "addbox": # for fixing endless reply from bot
                 session_handler.remove_user_session(str(current_user_id))   
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
@@ -217,7 +223,7 @@ class CommandCollection:
 
         session = session_handler.get_user_session_obj(str(current_user_id))
         if session != None:
-            if session["phase"] > 1: # for fixing endless reply from bot
+            if session["phase"] > 1 or session["command_name"] != "additem": # for fixing endless reply from bot
                 session_handler.remove_user_session(str(current_user_id))   
 
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
@@ -353,6 +359,12 @@ class CommandCollection:
         admin_user_id = await get_admin_user_id(update,context)
         session_handler = SessionHandler()
         current_user_id = update.message.from_user["id"]
+
+        session = session_handler.get_user_session_obj(str(current_user_id))
+        if session != None:
+            if session["phase"] > 1 or session["command_name"] != "editbox": # for fixing endless reply from bot
+                session_handler.remove_user_session(str(current_user_id))   
+
         db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
         if (admin_user_id == current_user_id):
