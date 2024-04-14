@@ -55,6 +55,9 @@ class SessionedCommandHandler:
                 await self.handle_add_box_phase_description(update,context,session["box"],session,user_id)
 
             self.session_handler.update_session(user_id,box_id,update_item_id=True)
+
+        else:
+            await self.message.reply_text("Something happened with session.")
             
     # add box section ended
 
