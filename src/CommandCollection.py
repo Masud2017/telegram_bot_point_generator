@@ -20,7 +20,7 @@ help_content_for_admin_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
 /help - 명령어 도움말을 실행합니다.
 /myid - 유저의 텔레그램 아이디를 제공 받을 수 있습니다.
-/balance - 유저의 포인트 잔액을 확인할 수 있습니다.
+/balance - 유저의 포인트 잔액을 확인할 수 있습니다 or using /balance <user_id> to see other users' balance.
 /transfer <텔레그램 아이디> <금액> - 포인트를 회원에게 송금합니다.
 /inventory - 유저의 인벤토리 현황을 볼 수 있습니다.
 /openbox - 랜덤상자를 열 수 있습니다.
@@ -80,15 +80,42 @@ class CommandCollection:
     @staticmethod
     async def balance(update:Update, context: ContextTypes.DEFAULT_TYPE):
         current_user_id = update.message.from_user["id"]
+        admin_user_id = await get_admin_user_id(update,context)
+        if (current_user_id == admin_user_id):
+            splitted_message = update.message.text.split(" ")
+            if (len(splitted_message) == 2):
+                user_id = splitted_message[1]
+                if user_id.isnumeric():
+                    if not db.is_user_exist(user_id):
+                        await update.message.reply_text("Sorry invalid user id does not exists.")
+                    balance = db.get_balance(user_id)
+                    if type(balance) == type(0.0):
+                        balance = round(balance,2)
+                    
+                    await update.message.reply_text(f"잔액 조회 대상 아이디 : {user_id} \n보유 잔액 : {balance}")
+            
+            else:
+                db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
 
-        db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+                balance = db.get_balance(str(current_user_id))
 
-        balance = db.get_balance(str(current_user_id))
-        await update.message.reply_text(f"보유 잔액은 {balance} 원입니다")
+                if type(balance) == type(0.0):
+                    balance = round(balance,2)
+
+                await update.message.reply_text(f"보유 잔액은 {balance} 원입니다")
+        
+
+        else:
+            db.init_users(str(current_user_id),update.message) # this function will only work if the user is new and does not have any record else  it will be ignored
+
+            balance = db.get_balance(str(current_user_id))
+            if type(balance) == type(0.0):
+                balance = round(balance,2)
+            await update.message.reply_text(f"보유 잔액은 {balance} 원입니다")
 
     @staticmethod
     async def transfer(update:Update, context: ContextTypes.DEFAULT_TYPE):
-
+        admin_user_id = str(await get_admin_user_id(update,context))
         splitted_message = update.message.text.split(" ")
         recipient_user_id = splitted_message[1]
         amount = int(splitted_message[2])
@@ -98,10 +125,21 @@ class CommandCollection:
 
         if len(splitted_message) == 3:
             if (db.is_user_exist(recipient_user_id)):
-                if await db.transfer_currency(current_user_id,recipient_user_id,amount):
-                    await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+
+                if admin_user_id == current_user_id:
+                    if await db.transfer_currency(current_user_id,recipient_user_id,amount):
+                        await update.message.reply_text(f"{amount} 원이 성공적으로 {recipient_user_id} 으로 전송 되었습니다.")
+                    else:
+                        await update.message.reply_text("잔액이 부족합니다.")
                 else:
-                    await update.message.reply_text("잔액이 부족합니다.")
+                    # else deduct 5% charge for each transfer
+                    transaction_charge = (amount * 5) / 100
+                    amount2 = amount - transaction_charge
+                    if await db.transfer_currency(current_user_id,recipient_user_id,amount,amount2,True):
+                        
+                        await update.message.reply_text(f"6491071043로 {amount} 포인트 송금이 완료되었습니다. \n송금 수수료(5%) : {transaction_charge} \n최종 송금된 포인트 : {amount2}")
+                    else:
+                        await update.message.reply_text(f"잔액이 부족합니다.")
             else:
                 await update.message.reply_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
         else:
@@ -416,6 +454,8 @@ class CommandCollection:
             #     await update.message.reply_text("While you are using a sessioned command you are not allowed to use any other commands.")
         else:
             pass
+
+
         
 
 # list of command handlers with their subsequent commands

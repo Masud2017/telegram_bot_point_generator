@@ -67,12 +67,15 @@ class DataBase:
        
         self.update_record("users",users)
     
-    async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int):
+    async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int,reciever_amount = 0, admin_transfer= False):
         users = json.loads(self.db.get("users"))
         if amount < 0: return False
         if users[sender_id]["balance"] >= amount:
             users[sender_id]["balance"] -= amount
-            users[receiver_id]["balance"] += amount
+            if (admin_transfer):
+                users[receiver_id]["balance"] += reciever_amount
+            else:
+                users[receiver_id]["balance"] += amount
             
             self.db.set("users", json.dumps(users))
             return True
