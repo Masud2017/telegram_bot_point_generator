@@ -559,7 +559,9 @@ class CommandCollection:
             if level != None:
                 await update.message.reply_text(f"회원님의 유저등급은 {level} 입니다.")
             else:
-                await update.message.reply_text("Something went wrong while trying to get the user level.")
+                db.init_level_to_current_user(current_user_id)
+                level = db.get_user_level_by_user_id(current_user_id)
+                await update.message.reply_text(f"회원님의 유저등급은 {level} 입니다.")
                 
         else:
             await update.message.reply_text("Sorry the user does not exists.")
