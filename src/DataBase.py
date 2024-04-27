@@ -67,13 +67,13 @@ class DataBase:
        
         self.update_record("users",users)
     
-    async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int,reciever_amount = 0, admin_transfer= False):
+    async def transfer_currency(self,sender_id:str, receiver_id:str, amount:int,receiver_amount = 0, admin_transfer= False):
         users = json.loads(self.db.get("users"))
         if amount < 0: return False
         if users[sender_id]["balance"] >= amount:
             users[sender_id]["balance"] -= amount
             if (admin_transfer):
-                users[receiver_id]["balance"] += reciever_amount
+                users[receiver_id]["balance"] += receiver_amount
             else:
                 users[receiver_id]["balance"] += amount
             
@@ -290,3 +290,69 @@ class DataBase:
         if (len(boxes) == 0):
             return "1"
         return (int(list(boxes)[-1]) + 1)
+    
+    def get_user_by_user_id(self,user_id:str):
+        users = json.loads(self.db.get("users"))
+        user_obj = None
+        
+        if user_id in users:
+            user_obj = users[user_id]
+        else:
+            user_obj = None
+
+        return user_obj
+    
+
+    def init_level_to_current_user(self, current_user_id):
+        users = json.loads(self.db.get("users"))
+        
+        if current_user_id in users:
+            users[current_user_id].update({"level" : "비회원"})
+            self.update_record("users",users)
+            return True
+        
+        else:
+            return False
+
+    
+    def promote_user_level(self, user_id):
+        users = json.loads(self.db.get("users"))
+        
+        if user_id in users:
+            if "level" not in users[user_id]:
+                users[user_id].update({"level" : "정회원"})
+                self.update_record("users",users)
+            else:
+                users[user_id]["level"] = "정회원"
+                self.update_record("users",users)
+            return True
+        
+        else:
+            return False
+        
+    def demote_user_level(self,user_id):
+        users = json.loads(self.db.get("users"))
+        
+        if user_id in users:
+            if "level" not in users[user_id]:
+                users[user_id].update({"level" : "비회원"})
+                self.update_record("users",users)
+            else:
+                users[user_id]["level"] = "비회원"
+                self.update_record("users",users)
+            return True
+        
+        else:
+            return False
+        
+    def get_user_level_by_user_id(self,user_id):
+        users = json.loads(self.db.get("users"))
+        
+        if user_id in users:
+            if "level" in users[user_id]:
+                return users[user_id]["level"]
+            else:
+                return None
+        
+        else:
+            return None

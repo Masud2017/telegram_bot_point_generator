@@ -10,6 +10,7 @@ help_content_for_regular_user ="""
                 안녕하세요! 각종 도움이 되는 도움말을 제공합니다!
 /help - 명령어 도움말을 실행합니다.
 /myid - 유저의 텔레그램 아이디를 제공 받을 수 있습니다.
+/mylevel - 유저의 회원등급을 확인할 수 있습니다.
 /balance - 유저의 포인트 잔액을 확인할 수 있습니다.
 /transfer <텔레그램 아이디> <금액> - 포인트를 회원에게 송금합니다.
 /inventory - 유저의 인벤토리 현황을 볼 수 있습니다.
@@ -36,6 +37,9 @@ help_content_for_admin_user ="""
 /editprobability <box_id> <item_name> <probability> - Edit probability of an item in a box
 /editbox - Edit a box
 /deletebox <box_id> - Delete a box
+/promote <user_id> - Promote an user from 비회원 to 정회원 level
+/demote <user_id> - Demote an user from 정회원 to 비회원 level
+/user_level <user_id> - Get user level by user id
                 """
 
 
@@ -132,14 +136,24 @@ class CommandCollection:
                     else:
                         await update.message.reply_text("잔액이 부족합니다.")
                 else:
-                    # else deduct 5% charge for each transfer
-                    transaction_charge = (amount * 5) / 100
-                    amount2 = amount - transaction_charge
-                    if await db.transfer_currency(current_user_id,recipient_user_id,amount,amount2,True):
-                        
-                        await update.message.reply_text(f"6491071043로 {amount} 포인트 송금이 완료되었습니다. \n송금 수수료(5%) : {transaction_charge} \n최종 송금된 포인트 : {amount2}")
+                    # update for level
+                    current_user_obj = db.get_user_by_user_id(current_user_id)
+                    if "level" not in current_user_obj:
+                        db.init_level_to_current_user(current_user_id)
+                        await update.message.reply_text(f"회원님의 등급은 현재 비회원입니다. \n· 비회원 : 원벳 이용 내역이 발생되지 않은 회원\n- 포인트 송금 명령어 /transfer 불가, 포인트 → 원벳 전환 불가")
                     else:
-                        await update.message.reply_text(f"잔액이 부족합니다.")
+                        if db.get_user_level_by_user_id(current_user_id) == "정회원":
+                    # update for level section ended
+                            # deduct 5% charge for each transfer
+                            transaction_charge = (amount * 5) / 100
+                            amount2 = amount - transaction_charge
+                            if await db.transfer_currency(current_user_id,recipient_user_id,amount,amount2,True):
+                                
+                                await update.message.reply_text(f"6491071043로 {amount} 포인트 송금이 완료되었습니다. \n송금 수수료(5%) : {transaction_charge} \n최종 송금된 포인트 : {amount2}")
+                            else:
+                                await update.message.reply_text(f"잔액이 부족합니다.")
+                        else:
+                            await update.message.reply_text(f"회원님의 등급은 현재 비회원입니다. \n· 비회원 : 원벳 이용 내역이 발생되지 않은 회원\n- 포인트 송금 명령어 /transfer 불가, 포인트 → 원벳 전환 불가")
             else:
                 await update.message.reply_text("양식에 맞게 수취인의 아이디와 금액을 기재해주세요. 예) /transfer <텔레그램 ID> <송금할 금액>")
         else:
@@ -456,7 +470,100 @@ class CommandCollection:
             pass
 
 
+    @staticmethod
+    async def promote_user_level(update: Update, context : ContextTypes.DEFAULT_TYPE):
+        admin_user_id = str(await get_admin_user_id(update,context))
+        current_user_id = str(update.message.from_user["id"])
+
+        if admin_user_id == current_user_id:
+            splitted_message = update.message.text.split(" ")
+            if len(splitted_message) == 2:
+                user_id = splitted_message[1]
+                if user_id.isnumeric():
+                    if db.is_user_exist(user_id):
+                        if db.promote_user_level(user_id):
+                            await update.message.reply_text(f"The user: {user_id} is now promoted to level 정회원")
+                        else:
+                            await update.message.reply_text(f"Something went wrong while trying to promoting this user: {user_id}")
+                    else:
+                        await update.message.reply_text("Sorry this user does not exists..")
+
+                else:
+                    await update.message.reply_text("Invalid user id type. Please provide proper user id")
+            else:
+                await update.message.reply_text("Invalid command please use this structure : /promote <user_id>")
+
+        else:
+            await update.message.reply_text("Invalid admin privilege")
+
+    @staticmethod
+    async def demote_user_level(update: Update, context : ContextTypes.DEFAULT_TYPE):
+        admin_user_id = str(await get_admin_user_id(update,context))
+        current_user_id = str(update.message.from_user["id"])
+
+        if admin_user_id == current_user_id:
+            splitted_message = update.message.text.split(" ")
+            if len(splitted_message) == 2:
+                user_id = splitted_message[1]
+                if user_id.isnumeric():
+                    if db.is_user_exist(user_id):
+                        if db.demote_user_level(user_id):
+                            await update.message.reply_text(f"The user: {user_id} is now demoted to level 비회원")
+                        else:
+                            await update.message.reply_text(f"Something went wrong while trying to demoting this user: {user_id}")
+                    else:
+                        await update.message.reply_text("Sorry this user does not exists..")
+
+                else:
+                    await update.message.reply_text("Invalid user id type. Please provide proper user id")
+            else:
+                await update.message.reply_text("Invalid command please use this structure : /demote <user_id>")
+
+        else:
+            await update.message.reply_text("Invalid admin privilege")
         
+    @staticmethod
+    async def get_user_level(update: Update, context : ContextTypes.DEFAULT_TYPE):
+        admin_user_id = str(await get_admin_user_id(update,context))
+        current_user_id = str(update.message.from_user["id"])
+
+        if admin_user_id == current_user_id:
+            splited_message = update.message.text.split(" ")
+            if len(splited_message) == 2:
+                user_id = splited_message[1]
+                if user_id.isnumeric():
+                    if db.is_user_exist(user_id):
+                        level = db.get_user_level_by_user_id(user_id)
+                        await update.message.reply_text(f"아이디 : {user_id}\n등급 : {level}")
+                    else:
+                        await update.message.reply_text("Sorry this user does not exists..")
+
+                else:
+                    await update.message.reply_text("Invalid user id type. Please provide proper user id")
+            else:
+                await update.message.reply_text("Invalid command please use this structure : /user_level <user_id>")
+        else:
+            await update.message.reply_text("Invalid admin privilege")
+        
+    @staticmethod
+    async def get_my_level(update : Update , context : ContextTypes.DEFAULT_TYPE):
+        current_user_id = str(update.message.from_user["id"])
+        admin_user_id = str(await get_admin_user_id(update,context))
+
+        if current_user_id == admin_user_id:
+            await update.message.reply_text("Admin user does not need any level.")
+            return
+
+        elif db.is_user_exist(current_user_id):
+            level = db.get_user_level_by_user_id(current_user_id)
+            if level != None:
+                await update.message.reply_text(f"회원님의 유저등급은 {level} 입니다.")
+            else:
+                await update.message.reply_text("Something went wrong while trying to get the user level.")
+                
+        else:
+            await update.message.reply_text("Sorry the user does not exists.")
+
 
 # list of command handlers with their subsequent commands
 help_command = CommandHandler("help", CommandCollection.help)
@@ -475,4 +582,9 @@ withdrawitem_command = CommandHandler("withdrawitem", CommandCollection.withdraw
 editprobability_command = CommandHandler("editprobability", CommandCollection.editprobability)
 editbox_command = CommandHandler("editbox", CommandCollection.editbox)
 deletebox_command = CommandHandler("deletebox", CommandCollection.deletebox)
+
+promote_user_level_command = CommandHandler("promote",CommandCollection.promote_user_level)
+demote_user_level_command = CommandHandler("demote",CommandCollection.demote_user_level)
+get_user_level_command = CommandHandler("user_level",CommandCollection.get_user_level)
+get_my_level_command = CommandHandler("mylevel",CommandCollection.get_my_level)
 message_handler = MessageHandler(filters.ALL,CommandCollection.regular_message)

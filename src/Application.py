@@ -26,6 +26,12 @@ class Application:
         self.app.add_handler(editprobability_command)
         self.app.add_handler(editbox_command)
         self.app.add_handler(deletebox_command)
+
+        self.app.add_handler(promote_user_level_command)
+        self.app.add_handler(demote_user_level_command)
+        self.app.add_handler(get_user_level_command)
+        self.app.add_handler(get_my_level_command)
+        
         self.app.add_handler(message_handler)
 
 
